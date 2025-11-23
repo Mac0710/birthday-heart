@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Heart Animation</title>
+<style>
+    body {
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    canvas {
+        border: none;
+    }
+</style>
+</head>
+<body>
+<canvas id="heartCanvas" width="800" height="800"></canvas>
+
+<script>
+const canvas = document.getElementById('heartCanvas');
+const ctx = canvas.getContext('2d');
+
+const scale = 20;
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+
+function heartA(k) {
+    return 15 * Math.pow(Math.sin(k), 3);
+}
+
+function heartB(k) {
+    return 12 * Math.cos(k) - 5 * Math.cos(2*k) - 2*Math.cos(3*k) - Math.cos(4*k);
+}
+
+// Thinner lines and dots
+ctx.strokeStyle = 'red';
+ctx.fillStyle = 'red';
+ctx.lineWidth = 1.2;
+const dotRadius = 2;
+
+let totalPoints = 384;
+let points = [];
+
+// Precompute all points
+for (let k = 0; k <= totalPoints; k++) {
+    let x = heartA(k) * scale + centerX;
+    let y = -heartB(k) * scale + centerY;
+    points.push({x, y});
+}
+
+let current = 0;
+
+// Super slow: 1 dot per frame, large delay
+function drawHeart() {
+    if (current >= points.length) {
+        // Birthday message after heart is complete
+        ctx.fillStyle = 'white';
+        ctx.font = '28px Arial Black';
+        ctx.textAlign = 'center';
+        ctx.fillText('Happy Birthdayyy B!!!', centerX, centerY);
+        return;
+    }
+
+    // Draw line
+    if (current > 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[current-1].x, points[current-1].y);
+        ctx.lineTo(points[current].x, points[current].y);
+        ctx.stroke();
+    }
+
+    // Draw dot
+    ctx.beginPath();
+    ctx.arc(points[current].x, points[current].y, dotRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    current++;
+
+    // Huge delay for ultra-slow effect
+    setTimeout(drawHeart, 60); // 80ms per dot, increase to 120~150ms for even slower
+}
+
+drawHeart();
+</script>
+</body>
+</html>
